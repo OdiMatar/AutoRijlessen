@@ -2,10 +2,11 @@
     <section class="hero">
         <div>
             <p class="eyebrow">Dashboard</p>
-            <h1>Welkom bij Autorijschool Rijvaardig</h1>
+            <h1>Welkom bij Autorijschool De Komeet</h1>
             <p>Beheer instructeurs en voertuigen volgens de MVC-opdracht. Je rol bepaalt welke acties je mag uitvoeren.</p>
             <div class="hero-actions">
-                <a class="button" href="{{ route('instructeurs.index') }}">Bekijk instructeurs</a>
+                <a class="button" href="{{ route('instructeurs.index') }}">Instructeurs in dienst</a>
+                <a class="button secondary" href="{{ route('voertuigen.alles') }}">Alle voertuigen</a>
                 @if (auth()->user()->canManageVehicles())
                     <span class="role-card">Je bent ingelogd als {{ auth()->user()->role }} en mag voertuiggegevens wijzigen.</span>
                 @else
@@ -16,15 +17,18 @@
     </section>
 
     <section class="dashboard-grid">
-        <article>
+        <a class="dashboard-card" href="{{ route('instructeurs.index') }}">
+            <span class="card-kicker">01</span>
             <h2>Instructeurs</h2>
             <p>Bekijk alle instructeurs in dienst, gesorteerd op aantal sterren.</p>
-        </article>
-        <article>
+        </a>
+        <a class="dashboard-card" href="{{ route('voertuigen.alles') }}">
+            <span class="card-kicker">02</span>
             <h2>Voertuigen</h2>
-            <p>Bekijk toegewezen voertuigen per instructeur en de beschikbare voertuigen.</p>
-        </article>
-        <article>
+            <p>Bekijk toegewezen voertuigen per instructeur, beschikbare voertuigen en alle voertuigen.</p>
+        </a>
+        <article class="dashboard-card">
+            <span class="card-kicker">03</span>
             <h2>Rechten</h2>
             <p>Owner en admin hebben volledige toegang. Instructeurs kunnen alleen gegevens bekijken.</p>
         </article>

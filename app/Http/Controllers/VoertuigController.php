@@ -9,9 +9,17 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class VoertuigController extends Controller
 {
+    public function alleVoertuigen(): View
+    {
+        return view('voertuigen.alles', [
+            'voertuigen' => DB::select('CALL sp_get_alle_voertuigen()'),
+        ]);
+    }
+
     public function index(Instructeur $instructeur)
     {
         return view('voertuigen.index', [
@@ -66,5 +74,33 @@ class VoertuigController extends Controller
         return redirect()
             ->route('instructeurs.voertuigen.index', $instructeur)
             ->with('success', 'De voertuiggegevens zijn gewijzigd.');
+    }
+
+    public function destroyFromInstructor(Instructeur $instructeur, Voertuig $voertuig): View
+    {
+        DB::selectOne('CALL sp_verwijder_voertuig_bij_instructeur(?, ?)', [$instructeur->Id, $voertuig->Id]);
+
+        return view('voertuigen.status', [
+            'title' => 'Voertuig verwijderd',
+            'message' => 'Het door u geselecteerde voertuig is verwijderd',
+            'redirectUrl' => route('instructeurs.voertuigen.index', $instructeur),
+        ]);
+    }
+
+    public function destroyFromAll(Voertuig $voertuig): View|RedirectResponse
+    {
+        $result = DB::selectOne('CALL sp_verwijder_voertuig_uit_alle_voertuigen(?)', [$voertuig->Id]);
+
+        if ((int) $result->IsVerwijderd !== 1) {
+            return redirect()
+                ->route('voertuigen.alles')
+                ->with('error', $result->Melding);
+        }
+
+        return view('voertuigen.status', [
+            'title' => 'Voertuig verwijderd',
+            'message' => $result->Melding,
+            'redirectUrl' => route('voertuigen.alles'),
+        ]);
     }
 }

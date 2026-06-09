@@ -1,15 +1,7 @@
-<x-layout title="Door instructeur gebruikte voertuigen">
+<x-layout title="Alle voertuigen">
     <section class="page-heading">
         <div>
-            <h1>Door instructeur gebruikte voertuigen</h1>
-            <div class="detail-lines">
-                <p>Naam: [{{ $instructeur->VolledigeNaam }}]</p>
-                <p>Datum in dienst: [{{ $instructeur->DatumInDienst->format('d-m-Y') }}]</p>
-                <p>Aantal sterren: [{{ $instructeur->AantalSterren }}]</p>
-            </div>
-            @if (auth()->user()->canManageVehicles())
-                <a class="button add-under-text" href="{{ route('instructeurs.voertuigen.beschikbaar', $instructeur) }}">Toevoegen voertuig</a>
-            @endif
+            <h1>Alle voertuigen</h1>
         </div>
     </section>
 
@@ -23,14 +15,14 @@
                     <th>Bouwjaar</th>
                     <th>Brandstof</th>
                     <th>Rijbewijscategorie</th>
+                    <th>Instructeur naam</th>
                     @if (auth()->user()->canManageVehicles())
-                        <th>Wijzigen</th>
                         <th>Verwijderen</th>
                     @endif
                 </tr>
             </thead>
             <tbody>
-                @forelse ($voertuigen as $voertuig)
+                @foreach ($voertuigen as $voertuig)
                     <tr>
                         <td>{{ $voertuig->TypeVoertuig }}</td>
                         <td>{{ $voertuig->Type }}</td>
@@ -38,14 +30,10 @@
                         <td>{{ \Illuminate\Support\Carbon::parse($voertuig->Bouwjaar)->format('d-m-Y') }}</td>
                         <td>{{ $voertuig->Brandstof }}</td>
                         <td>{{ $voertuig->Rijbewijscategorie }}</td>
+                        <td>{{ $voertuig->InstructeurNaam ?? '-' }}</td>
                         @if (auth()->user()->canManageVehicles())
                             <td>
-                                <a class="icon-button" href="{{ route('instructeurs.voertuigen.edit', [$instructeur, $voertuig->Id]) }}" title="Wijzigen" aria-label="Wijzigen">
-                                    &#9998;
-                                </a>
-                            </td>
-                            <td>
-                                <form method="post" action="{{ route('instructeurs.voertuigen.destroy', [$instructeur, $voertuig->Id]) }}">
+                                <form method="post" action="{{ route('voertuigen.destroy', $voertuig->Id) }}">
                                     @csrf
                                     @method('DELETE')
                                     <button class="icon-button danger" type="submit" title="Verwijderen" aria-label="Verwijderen">x</button>
@@ -53,11 +41,7 @@
                             </td>
                         @endif
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="{{ auth()->user()->canManageVehicles() ? 8 : 6 }}">Geen voertuigen toegewezen.</td>
-                    </tr>
-                @endforelse
+                @endforeach
             </tbody>
         </table>
     </div>

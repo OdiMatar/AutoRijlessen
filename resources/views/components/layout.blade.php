@@ -8,11 +8,12 @@
 </head>
 <body>
     <header class="topbar">
-        <a href="{{ auth()->check() ? route('home') : route('login') }}" class="brand">Autorijschool Rijvaardig</a>
+        <a href="{{ auth()->check() ? route('home') : route('login') }}" class="brand">Autorijschool De Komeet</a>
         <nav>
             @auth
                 <a href="{{ route('home') }}">Home</a>
-                <a href="{{ route('instructeurs.index') }}">Instructeurs</a>
+                <a href="{{ route('instructeurs.index') }}">Instructeurs in dienst</a>
+                <a href="{{ route('voertuigen.alles') }}">Alle voertuigen</a>
                 <span class="user-pill">{{ auth()->user()->name }} - {{ ucfirst(auth()->user()->role) }}</span>
                 <form method="post" action="{{ route('logout') }}">
                     @csrf
@@ -28,6 +29,9 @@
     <main class="page">
         @if (session('success'))
             <div class="alert">{{ session('success') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-error auto-dismiss">{{ session('error') }}</div>
         @endif
 
         {{ $slot }}

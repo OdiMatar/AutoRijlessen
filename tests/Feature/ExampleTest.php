@@ -24,6 +24,6 @@ class ExampleTest extends TestCase
         $this->actingAs($user)
             ->get('/')
             ->assertOk()
-            ->assertSee('Welkom bij Autorijschool Rijvaardig');
+            ->assertSee('Welkom bij Autorijschool De Komeet');
     }
 }

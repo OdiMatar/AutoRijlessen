@@ -19,10 +19,13 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/instructeurs', [InstructeurController::class, 'index'])->name('instructeurs.index');
     Route::get('/instructeurs/{instructeur}/voertuigen', [VoertuigController::class, 'index'])->name('instructeurs.voertuigen.index');
+    Route::get('/voertuigen', [VoertuigController::class, 'alleVoertuigen'])->name('voertuigen.alles');
 
     Route::middleware('can.manage.vehicles')->group(function (): void {
         Route::get('/instructeurs/{instructeur}/voertuigen/beschikbaar', [VoertuigController::class, 'beschikbaar'])->name('instructeurs.voertuigen.beschikbaar');
         Route::get('/instructeurs/{instructeur}/voertuigen/{voertuig}/wijzigen', [VoertuigController::class, 'edit'])->name('instructeurs.voertuigen.edit');
         Route::put('/instructeurs/{instructeur}/voertuigen/{voertuig}', [VoertuigController::class, 'update'])->name('instructeurs.voertuigen.update');
+        Route::delete('/instructeurs/{instructeur}/voertuigen/{voertuig}', [VoertuigController::class, 'destroyFromInstructor'])->name('instructeurs.voertuigen.destroy');
+        Route::delete('/voertuigen/{voertuig}', [VoertuigController::class, 'destroyFromAll'])->name('voertuigen.destroy');
     });
 });

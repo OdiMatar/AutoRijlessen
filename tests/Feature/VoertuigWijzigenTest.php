@@ -98,4 +98,57 @@ class VoertuigWijzigenTest extends TestCase
             ->assertOk()
             ->assertSee('Wijzigen voertuiggegevens');
     }
+
+    public function test_toegewezen_voertuig_verwijderen_bij_instructeur_maakt_het_beschikbaar(): void
+    {
+        $user = User::factory()->create(['role' => 'owner']);
+
+        $this->actingAs($user)
+            ->delete(route('instructeurs.voertuigen.destroy', [5, 10]))
+            ->assertOk()
+            ->assertSee('Het door u geselecteerde voertuig is verwijderd');
+
+        $this->assertDatabaseMissing('voertuig_instructeur', [
+            'VoertuigId' => 10,
+            'InstructeurId' => 5,
+        ]);
+
+        $beschikbaar = collect(DB::select('CALL sp_get_beschikbare_voertuigen()'));
+
+        $this->assertTrue($beschikbaar->contains('Id', 10));
+    }
+
+    public function test_toegewezen_voertuig_verwijderen_uit_alle_voertuigen_zet_voertuig_non_actief(): void
+    {
+        $user = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($user)
+            ->delete(route('voertuigen.destroy', 10))
+            ->assertOk()
+            ->assertSee('Het door u geselecteerde voertuig is verwijderd');
+
+        $this->assertDatabaseHas('voertuigen', [
+            'Id' => 10,
+            'IsActief' => 0,
+        ]);
+
+        $alleVoertuigen = collect(DB::select('CALL sp_get_alle_voertuigen()'));
+
+        $this->assertFalse($alleVoertuigen->contains('Id', 10));
+    }
+
+    public function test_niet_toegewezen_voertuig_kan_niet_worden_verwijderd_uit_alle_voertuigen(): void
+    {
+        $user = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($user)
+            ->delete(route('voertuigen.destroy', 11))
+            ->assertRedirect(route('voertuigen.alles'))
+            ->assertSessionHas('error', 'Het door u geselecteerde voertuig staat op non actief en kan niet worden verwijderd');
+
+        $this->assertDatabaseHas('voertuigen', [
+            'Id' => 11,
+            'IsActief' => 1,
+        ]);
+    }
 }
